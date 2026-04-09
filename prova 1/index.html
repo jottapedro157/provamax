@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="login-card">
+    <h1>Login</h1>
+
+    <form id="loginForm">
+
+      <div class="field-group">
+        <label for="username">Usuário:</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          placeholder="Digite seu usuário"
+          autocomplete="username"
+        />
+      </div>
+
+      <div class="field-group">
+        <label for="password">Senha:</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Digite sua senha"
+          autocomplete="current-password"
+        />
+      </div>
+
+      <button type="submit">Entrar</button>
+
+      <p id="result"></p>
+
+    </form>
+  </div>
+
+  <script>
+    const form     = document.getElementById('loginForm');
+    const result   = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      result.textContent = '';
+      result.className   = '';
+      const btn = form.querySelector('button[type="submit"]');
+      btn.disabled    = true;
+      btn.textContent = 'Aguarde...';
+
+      try {
+        const response = await fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          result.textContent = data.message;
+          result.className   = 'success';
+        } else {
+          result.textContent = data.error;
+          result.className   = 'error';
+        }
+
+      } catch (err) {
+        result.textContent = 'Não foi possível conectar ao servidor. Verifique se ele está rodando.';
+        result.className   = 'error';
+      } finally {
+        btn.disabled    = false;
+        btn.textContent = 'Entrar';
+      }
+    });
+  </script>
+
+</body>
+</html>
